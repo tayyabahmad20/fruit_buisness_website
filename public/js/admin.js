@@ -166,12 +166,12 @@ function renderDashboard() {
   if (!tbody) return;
   tbody.innerHTML = recent.map(o => `
     <tr>
-      <td class="font-mono text-xs">${o.id}</td>
+      <td class="font-mono text-xs">${escHtml(o.id)}</td>
       <td>${escHtml(o.customerName)}</td>
-      <td>${o.boxType}</td>
+      <td>${escHtml(o.boxType)}</td>
       <td class="font-semibold" style="color:var(--primary-green)">Rs.${(o.totalAmount||0).toLocaleString()}</td>
       <td><span class="badge badge-${o.status}">${formatStatus(o.status)}</span></td>
-      <td class="text-xs" style="color:var(--text-secondary)">${o.date || ''}</td>
+      <td class="text-xs" style="color:var(--text-secondary)">${escHtml(o.date || '')}</td>
     </tr>
   `).join('');
 }
@@ -188,20 +188,20 @@ function renderOrdersTable(ordersArr) {
   }
   tbody.innerHTML = ordersArr.map(o => `
     <tr>
-      <td class="font-mono text-xs">${o.id}</td>
+      <td class="font-mono text-xs">${escHtml(o.id)}</td>
       <td class="font-semibold">${escHtml(o.customerName)}</td>
-      <td><a href="tel:${o.phone}" style="color:var(--primary-green)">${o.phone}</a></td>
-      <td>${o.boxType}</td>
+      <td><a href="tel:${escHtml(o.phone)}" style="color:var(--primary-green)">${escHtml(o.phone)}</a></td>
+      <td>${escHtml(o.boxType)}</td>
       <td class="font-semibold" style="color:var(--primary-orange)">Rs.${(o.totalAmount||0).toLocaleString()}</td>
       <td>
         <select class="form-input text-xs py-1 px-2 w-36"
-          onchange="updateOrderStatus('${o.id}', this.value)">
+          onchange="updateOrderStatus('${escHtml(o.id)}', this.value)">
           ${['pending','packed','out_for_delivery','delivered'].map(s =>
             `<option value="${s}" ${o.status===s?'selected':''}>${formatStatus(s)}</option>`
           ).join('')}
         </select>
       </td>
-      <td class="text-xs" style="color:var(--text-secondary)">${o.date || ''}</td>
+      <td class="text-xs" style="color:var(--text-secondary)">${escHtml(o.date || '')}</td>
     </tr>
   `).join('');
 }
@@ -245,13 +245,13 @@ function renderProductsTable() {
   if (!tbody) return;
   tbody.innerHTML = products.map(p => `
     <tr>
-      <td class="text-2xl">${p.emoji}</td>
+      <td class="text-2xl">${escHtml(p.emoji)}</td>
       <td class="font-semibold">${escHtml(p.name)}</td>
-      <td style="color:var(--text-secondary)">${p.category || 'Fruit'}</td>
+      <td style="color:var(--text-secondary)">${escHtml(p.category || 'Fruit')}</td>
       <td style="color:var(--primary-green)">Rs.${(p.price5kg||0).toLocaleString()}</td>
       <td style="color:var(--primary-green)">Rs.${(p.price10kg||0).toLocaleString()}</td>
       <td>
-        <button onclick="toggleAvailability('${p.id}')"
+        <button onclick="toggleAvailability('${escHtml(p.id)}')"
           class="badge ${p.available ? 'badge-delivered' : 'badge-pending'} cursor-pointer">
           ${p.available ? '✅ Yes' : '❌ No'}
         </button>
@@ -262,9 +262,9 @@ function renderProductsTable() {
         </span>
       </td>
       <td>
-        <button onclick="openProductModal('${p.id}')"
+        <button onclick="openProductModal('${escHtml(p.id)}')"
           class="text-blue-500 hover:text-blue-700 mr-2 font-semibold text-sm">✏️ Edit</button>
-        <button onclick="deleteProduct('${p.id}')"
+        <button onclick="deleteProduct('${escHtml(p.id)}')"
           class="text-red-500 hover:text-red-700 font-semibold text-sm">🗑️ Del</button>
       </td>
     </tr>

@@ -82,13 +82,34 @@
       pw.type = pw.type === 'password' ? 'text' : 'password';
     }
 
-    // Login form submission
-    document.getElementById('login-form').addEventListener('submit', function (e) {
+    // Login form submission — tries backend API first, falls back to demo credentials
+    document.getElementById('login-form').addEventListener('submit', async function (e) {
       e.preventDefault();
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
       const errorDiv = document.getElementById('login-error');
+      errorDiv.classList.add('hidden');
 
+      // Attempt backend authentication
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem('adminLoggedIn', 'true');
+          localStorage.setItem('adminUsername', username);
+          if (data.token) localStorage.setItem('adminToken', data.token);
+          window.location.href = 'admin-dashboard.html';
+          return;
+        }
+      } catch (_) {
+        // Backend unavailable — fall through to demo check below
+      }
+
+      // Demo fallback (only used when backend is not running)
       if (username === 'admin' && password === 'admin123') {
         localStorage.setItem('adminLoggedIn', 'true');
         localStorage.setItem('adminUsername', username);

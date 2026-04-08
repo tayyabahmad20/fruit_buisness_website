@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'freshlux-secret-key-2024';
+if (!process.env.JWT_SECRET) {
+  console.warn('[WARN] JWT_SECRET env variable is not set. Using a generated fallback for this run. Set JWT_SECRET in production!');
+}
+const JWT_SECRET = process.env.JWT_SECRET || require('crypto').randomBytes(64).toString('hex');
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
