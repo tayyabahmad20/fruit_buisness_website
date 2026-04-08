@@ -10,6 +10,18 @@ const MOCK_ORDERS = [
   { id: 'FL005', customer: 'Usman Tariq', phone: '0321-6667788', address: 'Johar Town, Lahore', items: '5kg Box', total: 1800, status: 'delivered', date: '2024-01-07' },
 ];
 
+function loadOrders() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('freshlux_orders') || '[]');
+    if (stored.length > 0) return stored;
+  } catch (_) {}
+  return MOCK_ORDERS;
+}
+
+function saveOrders(orders) {
+  try { localStorage.setItem('freshlux_orders', JSON.stringify(orders)); } catch (_) {}
+}
+
 const STATUS_STYLES = {
   pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
   packed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
@@ -24,7 +36,7 @@ const TABS = ['Dashboard', 'Orders', 'Products', 'Analytics'];
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Dashboard');
-  const [orders, setOrders] = useState(MOCK_ORDERS);
+  const [orders, setOrders] = useState(loadOrders);
   const [products, setProducts] = useState(ALL_PRODUCTS);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -106,7 +118,13 @@ export default function AdminDashboard() {
               </div>
               <div className="glass-card p-5">
                 <h2 className="font-bold text-base mb-4" style={{ color: 'var(--text-primary)' }}>Recent Orders</h2>
-                <OrdersTable orders={orders.slice(0, 5)} onStatusChange={(id, status) => setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))} />
+                <OrdersTable orders={orders.slice(0, 5)} onStatusChange={(id, status) => {
+                  setOrders(prev => {
+                    const updated = prev.map(o => o.id === id ? { ...o, status } : o);
+                    saveOrders(updated);
+                    return updated;
+                  });
+                }} />
               </div>
             </>
           )}
@@ -115,7 +133,13 @@ export default function AdminDashboard() {
           {activeTab === 'Orders' && (
             <div className="glass-card p-5">
               <h2 className="font-bold text-base mb-4" style={{ color: 'var(--text-primary)' }}>All Orders ({orders.length})</h2>
-              <OrdersTable orders={orders} onStatusChange={(id, status) => setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))} />
+              <OrdersTable orders={orders} onStatusChange={(id, status) => {
+                setOrders(prev => {
+                  const updated = prev.map(o => o.id === id ? { ...o, status } : o);
+                  saveOrders(updated);
+                  return updated;
+                });
+              }} />
             </div>
           )}
 

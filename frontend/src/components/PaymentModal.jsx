@@ -32,13 +32,33 @@ export default function PaymentModal({ onClose }) {
   };
 
   const handlePlaceOrder = () => {
+    // Build a summary string for WhatsApp / display
+    const itemsSummary = cart.items
+      .map(i => `• ${i.emoji} ${i.name} (${i.size}) x${i.quantity} = Rs.${i.subtotal.toLocaleString()}`)
+      .join('\n');
+
     if (payMethod === 'cod') {
-      const items = cart.items
-        .map(i => `• ${i.emoji} ${i.name} (${i.size}) x${i.quantity} = Rs.${i.subtotal.toLocaleString()}`)
-        .join('\n');
-      const msg = `New Order - FreshLux Fruits\n\nName: ${form.name}\nPhone: ${form.phone}\nAddress: ${form.address}\nPayment: Cash on Delivery\n\nItems:\n${items}\n\nTotal: Rs.${cart.total.toLocaleString()}\nOrder ID: #${orderId}`;
+      const msg = `New Order - FreshLux Fruits\n\nName: ${form.name}\nPhone: ${form.phone}\nAddress: ${form.address}\nPayment: Cash on Delivery\n\nItems:\n${itemsSummary}\n\nTotal: Rs.${cart.total.toLocaleString()}\nOrder ID: #${orderId}`;
       window.open(`https://wa.me/923001234567?text=${encodeURIComponent(msg)}`, '_blank');
     }
+
+    // Persist order to localStorage so the admin dashboard can show it
+    const newOrder = {
+      id: orderId,
+      customer: form.name,
+      phone: form.phone,
+      address: form.address,
+      items: cart.items.map(i => `${i.name} (${i.size}) x${i.quantity}`).join(', '),
+      total: cart.total,
+      status: 'pending',
+      payment: payMethod,
+      date: new Date().toISOString().slice(0, 10),
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem('freshlux_orders') || '[]');
+      localStorage.setItem('freshlux_orders', JSON.stringify([newOrder, ...existing]));
+    } catch (_) {}
+
     clearCart();
     setStep('confirm');
   };
