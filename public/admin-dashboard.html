@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – FreshLux Fruits</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <style>
+    body { display: flex; min-height: 100vh; overflow-x: hidden; }
+
+    /* Sidebar */
+    #sidebar {
+      width: 260px;
+      min-height: 100vh;
+      background: var(--dark);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      z-index: 50;
+    }
+    @media (max-width: 768px) {
+      #sidebar { position: fixed; top: 0; left: 0; transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #main-content { margin-left: 0 !important; }
+    }
+
+    #main-content { flex: 1; min-width: 0; background: var(--bg-primary); transition: background 0.3s; }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      color: #a0aec0;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      font-weight: 500;
+      margin: 2px 8px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      width: calc(100% - 16px);
+      font-size: 0.95rem;
+    }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .sidebar-link.active { background: linear-gradient(135deg, var(--primary-green), #1d8a55); color: #fff; }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-pending      { background: #fef3c7; color: #92400e; }
+    .badge-packed       { background: #dbeafe; color: #1e40af; }
+    .badge-out_for_delivery { background: #fed7aa; color: #9a3412; }
+    .badge-delivered    { background: #d1fae5; color: #065f46; }
+
+    .dark .badge-pending      { background: rgba(254,243,199,0.15); color: #fcd34d; }
+    .dark .badge-packed       { background: rgba(219,234,254,0.15); color: #93c5fd; }
+    .dark .badge-out_for_delivery { background: rgba(253,186,116,0.15); color: #fb923c; }
+    .dark .badge-delivered    { background: rgba(209,250,229,0.15); color: #34d399; }
+
+    /* Table */
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .admin-table th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .admin-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .admin-table tr:hover td { background: rgba(45,106,79,0.04); }
+    .dark .admin-table tr:hover td { background: rgba(244,131,31,0.04); }
+
+    /* Stat Card */
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+    }
+
+    /* Modal */
+    #product-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    #product-modal.hidden { display: none; }
+    .modal-card {
+      background: var(--bg-secondary);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Sidebar overlay for mobile */
+    #sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 49;
+    }
+    #sidebar-overlay.show { display: block; }
+  </style>
+</head>
+<body class="bg-[var(--bg-primary)]">
+
+<!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<nav id="sidebar">
+  <!-- Logo -->
+  <div class="px-5 py-5 border-b" style="border-color:rgba(255,255,255,0.1)">
+    <div class="text-xl font-extrabold text-white flex items-center gap-2">🍊 FreshLux</div>
+    <div class="text-xs text-gray-400 mt-0.5">Admin Panel</div>
+  </div>
+
+  <!-- Nav Links -->
+  <div class="flex-1 py-4 overflow-y-auto">
+    <button class="sidebar-link active" data-section="dashboard" onclick="showSection('dashboard', this)">
+      <span>📊</span> Dashboard
+    </button>
+    <button class="sidebar-link" data-section="orders" onclick="showSection('orders', this)">
+      <span>📦</span> Orders
+    </button>
+    <button class="sidebar-link" data-section="products" onclick="showSection('products', this)">
+      <span>🍎</span> Products
+    </button>
+    <button class="sidebar-link" data-section="analytics" onclick="showSection('analytics', this)">
+      <span>📈</span> Analytics
+    </button>
+  </div>
+
+  <!-- Logout -->
+  <div class="p-4 border-t" style="border-color:rgba(255,255,255,0.1)">
+    <button onclick="logout()" class="sidebar-link w-full" style="color:#fc8181;margin:0;width:100%">
+      <span>🚪</span> Logout
+    </button>
+    <a href="index.html" class="sidebar-link block mt-1" style="color:#90cdf4;margin:0;width:100%;text-decoration:none">
+      <span>🌐</span> View Website
+    </a>
+  </div>
+</nav>
+
+<!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
+<div id="main-content" class="flex flex-col min-h-screen">
+
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-40 flex items-center justify-between px-6 py-4 border-b"
+    style="background:var(--card-bg);border-color:var(--border-color);backdrop-filter:blur(16px)">
+    <div class="flex items-center gap-3">
+      <!-- Hamburger (mobile) -->
+      <button onclick="toggleSidebar()" class="md:hidden text-xl p-1">☰</button>
+      <h1 class="font-bold text-lg" id="page-title" style="color:var(--text-primary)">Dashboard</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="toggleAdminDark()" class="text-xl p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="Toggle dark mode">
+        🌙
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full gradient-btn flex items-center justify-center text-white font-bold text-sm">A</div>
+        <span class="text-sm font-semibold hidden sm:block" style="color:var(--text-primary)" id="admin-name">Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Sections -->
+  <main class="flex-1 p-6 overflow-y-auto">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="section-dashboard">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div class="stat-card slide-up">
+          <div class="text-3xl mb-1">📦</div>
+          <div class="text-3xl font-extrabold" style="color:var(--primary-green)" id="stat-orders">0</div>
+          <div class="text-sm font-medium mt-1" style="color:var(--text-secondary)">Total Orders</div>
+        </div>
+        <div class="stat-card slide-up delay-100">
+          <div class="text-3xl mb-1">💰</div>
+          <div class="text-3xl font-extrabold" style="color:var(--primary-orange)" id="stat-revenue">Rs.0</div>
+          <div class="text-sm font-medium mt-1" style="color:var(--text-secondary)">Total Revenue</div>
+        </div>
+        <div class="stat-card slide-up delay-200">
+          <div class="text-3xl mb-1">⏳</div>
+          <div class="text-3xl font-extrabold text-yellow-500" id="stat-pending">0</div>
+          <div class="text-sm font-medium mt-1" style="color:var(--text-secondary)">Pending Orders</div>
+        </div>
+        <div class="stat-card slide-up delay-300">
+          <div class="text-3xl mb-1">✅</div>
+          <div class="text-3xl font-extrabold text-emerald-500" id="stat-delivered">0</div>
+          <div class="text-sm font-medium mt-1" style="color:var(--text-secondary)">Delivered</div>
+        </div>
+      </div>
+
+      <!-- Recent Orders Table -->
+      <div class="glass-card p-6">
+        <h2 class="font-bold text-lg mb-4" style="color:var(--text-primary)">Recent Orders</h2>
+        <div class="overflow-x-auto">
+          <table class="admin-table" id="recent-orders-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Customer</th><th>Box</th><th>Amount</th><th>Status</th><th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="recent-orders-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ORDERS ── -->
+    <div id="section-orders" class="hidden">
+      <div class="flex flex-col sm:flex-row gap-3 mb-5">
+        <input type="text" id="order-search" class="form-input flex-1 max-w-sm"
+          placeholder="Search by name or phone..." oninput="filterOrders()" />
+        <select id="order-status-filter" class="form-input w-48" onchange="filterOrders()">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="packed">Packed</option>
+          <option value="out_for_delivery">Out for Delivery</option>
+          <option value="delivered">Delivered</option>
+        </select>
+      </div>
+      <div class="glass-card p-6">
+        <div class="overflow-x-auto">
+          <table class="admin-table" id="orders-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Customer</th><th>Phone</th><th>Box</th><th>Amount</th>
+                <th>Status</th><th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRODUCTS ── -->
+    <div id="section-products" class="hidden">
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="font-bold text-lg" style="color:var(--text-primary)">Manage Products</h2>
+        <button onclick="openProductModal(null)" class="btn-primary text-sm px-5 py-2">
+          + Add Product
+        </button>
+      </div>
+      <div class="glass-card p-6">
+        <div class="overflow-x-auto">
+          <table class="admin-table" id="products-table">
+            <thead>
+              <tr>
+                <th>Emoji</th><th>Name</th><th>Category</th>
+                <th>5kg Price</th><th>10kg Price</th>
+                <th>Available</th><th>Featured</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS ── -->
+    <div id="section-analytics" class="hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-card p-6">
+          <h3 class="font-bold mb-4" style="color:var(--text-primary)">Orders by Day (Last 7 Days)</h3>
+          <canvas id="chart-orders-by-day" height="250"></canvas>
+        </div>
+        <div class="glass-card p-6">
+          <h3 class="font-bold mb-4" style="color:var(--text-primary)">Order Status Distribution</h3>
+          <canvas id="chart-status-dist" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════ PRODUCT MODAL ══════════════════════ -->
+<div id="product-modal" class="hidden">
+  <div class="modal-card">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold" style="color:var(--text-primary)" id="modal-title">Add Product</h2>
+      <button onclick="closeProductModal()" class="text-2xl leading-none hover:text-red-400" style="color:var(--text-secondary)">&times;</button>
+    </div>
+    <form id="product-form" onsubmit="saveProduct(event)">
+      <input type="hidden" id="product-edit-id" />
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="form-label" for="p-name">Name *</label>
+          <input type="text" id="p-name" class="form-input" required placeholder="e.g. Sindhri Mangoes" />
+        </div>
+        <div>
+          <label class="form-label" for="p-emoji">Emoji *</label>
+          <input type="text" id="p-emoji" class="form-input" required placeholder="🥭" maxlength="4" />
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="p-category">Category</label>
+        <input type="text" id="p-category" class="form-input" placeholder="Fruit" value="Fruit" />
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="form-label" for="p-price5">5kg Price (Rs.) *</label>
+          <input type="number" id="p-price5" class="form-input" required min="0" placeholder="850" />
+        </div>
+        <div>
+          <label class="form-label" for="p-price10">10kg Price (Rs.) *</label>
+          <input type="number" id="p-price10" class="form-input" required min="0" placeholder="1600" />
+        </div>
+      </div>
+      <div class="flex gap-6 mb-6">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="p-available" checked class="w-4 h-4 accent-green-600" />
+          <span class="font-medium" style="color:var(--text-primary)">Available</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="p-featured" class="w-4 h-4 accent-orange-500" />
+          <span class="font-medium" style="color:var(--text-primary)">Featured</span>
+        </label>
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary flex-1 justify-center">💾 Save Product</button>
+        <button type="button" onclick="closeProductModal()" class="btn-orange flex-1 justify-center">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,773 @@
+/* ========================================
+   FreshLux Fruits - Complete Stylesheet
+   ======================================== */
+
+/* ── CSS Variables ── */
+:root {
+  --primary-green: #2d6a4f;
+  --primary-orange: #f4831f;
+  --accent-cream: #fef9f0;
+  --dark: #1a1a2e;
+
+  --bg-primary: #fef9f0;
+  --bg-secondary: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a5568;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --border-color: rgba(45, 106, 79, 0.15);
+  --shadow: 0 4px 24px rgba(45, 106, 79, 0.10);
+}
+
+html.dark {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #f0f4f8;
+  --text-secondary: #a0aec0;
+  --card-bg: rgba(22, 33, 62, 0.85);
+  --border-color: rgba(244, 131, 31, 0.18);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Base Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.35s ease, color 0.35s ease;
+  overflow-x: hidden;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb {
+  background: var(--primary-green);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: #1d4d38; }
+
+/* ── Loading Screen ── */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-orange) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-emoji {
+  font-size: 4rem;
+  animation: spin-bounce 1s ease-in-out infinite;
+}
+
+.loading-title {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-top: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-top: 1.5rem;
+}
+
+@keyframes spin-bounce {
+  0%, 100% { transform: rotate(-15deg) scale(1); }
+  50% { transform: rotate(15deg) scale(1.2); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Keyframe Animations ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(-5deg); }
+  50% { transform: translateY(-28px) rotate(5deg); }
+}
+
+@keyframes floatAlt {
+  0%, 100% { transform: translateY(0px) rotate(5deg); }
+  50% { transform: translateY(-20px) rotate(-5deg); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(45, 106, 79, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(45, 106, 79, 0); }
+}
+
+@keyframes glow-green {
+  0%, 100% { box-shadow: 0 0 8px rgba(37, 211, 102, 0.5); }
+  50% { box-shadow: 0 0 22px rgba(37, 211, 102, 0.9), 0 0 40px rgba(37, 211, 102, 0.4); }
+}
+
+/* ── Floating Emoji Animations ── */
+.float-animation { animation: float 4s ease-in-out infinite; }
+.float-animation:nth-child(2) { animation: floatAlt 3.5s ease-in-out infinite; animation-delay: 0.5s; }
+.float-animation:nth-child(3) { animation: float 5s ease-in-out infinite; animation-delay: 1s; }
+.float-animation:nth-child(4) { animation: floatAlt 4.5s ease-in-out infinite; animation-delay: 1.5s; }
+.float-animation:nth-child(5) { animation: float 3.8s ease-in-out infinite; animation-delay: 0.8s; }
+.float-animation:nth-child(6) { animation: floatAlt 4.2s ease-in-out infinite; animation-delay: 0.3s; }
+
+/* ── Animation Classes (IntersectionObserver) ── */
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.slide-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.scale-in {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible,
+.slide-up.visible,
+.scale-in.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Staggered delays */
+.delay-100 { transition-delay: 0.1s; }
+.delay-200 { transition-delay: 0.2s; }
+.delay-300 { transition-delay: 0.3s; }
+.delay-400 { transition-delay: 0.4s; }
+.delay-500 { transition-delay: 0.5s; }
+
+/* ── Glassmorphism Cards ── */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(45, 106, 79, 0.18);
+}
+
+/* ── Gradient Backgrounds ── */
+.gradient-hero {
+  background: linear-gradient(135deg, var(--primary-green) 0%, #1d8a55 40%, var(--primary-orange) 100%);
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Navigation ── */
+.nav-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.3s ease;
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nav-link:hover {
+  color: var(--primary-green);
+  background: rgba(45, 106, 79, 0.08);
+}
+
+.dark .nav-link:hover {
+  color: var(--primary-orange);
+  background: rgba(244, 131, 31, 0.1);
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: linear-gradient(135deg, var(--primary-green), #1d8a55);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(45, 106, 79, 0.4);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 2px solid rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+}
+
+.btn-orange {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: linear-gradient(135deg, var(--primary-orange), #e06b00);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-orange:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(244, 131, 31, 0.4);
+}
+
+/* ── Freshness Badge ── */
+.freshness-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background: var(--card-bg);
+  border: 2px solid var(--primary-green);
+  border-radius: 9999px;
+  font-weight: 600;
+  color: var(--primary-green);
+  animation: pulse-border 2s ease-in-out infinite;
+  backdrop-filter: blur(8px);
+}
+
+/* ── Product Cards ── */
+.product-card {
+  min-width: 230px;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  flex-shrink: 0;
+}
+
+.product-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(45, 106, 79, 0.2);
+}
+
+.product-emoji { font-size: 3.5rem; margin-bottom: 0.75rem; display: block; }
+.product-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
+.product-price { color: var(--primary-green); font-weight: 600; font-size: 0.95rem; }
+
+.dark .product-price { color: var(--primary-orange); }
+
+/* ── Horizontal Scroll Container ── */
+.scroll-container {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-green) transparent;
+}
+
+.scroll-container::-webkit-scrollbar { height: 5px; }
+.scroll-container::-webkit-scrollbar-thumb { background: var(--primary-green); border-radius: 3px; }
+
+/* ── Fruit Box Builder ── */
+.box-type-btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.box-type-btn.active {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+  color: #fff;
+  border-color: transparent;
+}
+
+.fruit-selector-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  position: relative;
+  user-select: none;
+}
+
+.fruit-selector-item:hover {
+  border-color: var(--primary-green);
+  transform: translateY(-2px);
+}
+
+.fruit-selector-item.selected {
+  border-color: var(--primary-green);
+  background: rgba(45, 106, 79, 0.1);
+}
+
+.dark .fruit-selector-item.selected {
+  background: rgba(244, 131, 31, 0.1);
+  border-color: var(--primary-orange);
+}
+
+.fruit-selector-item .checkmark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  background: var(--primary-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.75rem;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+}
+
+.fruit-selector-item.selected .checkmark {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Step Tracker ── */
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.step-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: 60%;
+  width: 80%;
+  height: 2px;
+  background: var(--border-color);
+}
+
+.step-item.active:not(:last-child)::after,
+.step-item.done:not(:last-child)::after {
+  background: var(--primary-green);
+}
+
+.step-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.step-item.active .step-circle {
+  background: var(--primary-green);
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 6px rgba(45, 106, 79, 0.15);
+}
+
+.step-item.done .step-circle {
+  background: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+/* ── Star Ratings ── */
+.star-rating { color: #f4831f; font-size: 1rem; letter-spacing: 2px; }
+
+/* ── Testimonial Cards ── */
+.testimonial-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(45, 106, 79, 0.15);
+}
+
+/* ── Why Choose Us Cards ── */
+.feature-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 36px rgba(45, 106, 79, 0.15);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* ── Cart Panel ── */
+#cart-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 380px;
+  max-width: 95vw;
+  z-index: 200;
+  background: var(--bg-secondary);
+  box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#cart-panel.open { transform: translateX(0); }
+
+#cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+#cart-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.cart-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+  color: #fff;
+}
+
+.cart-items { flex: 1; overflow-y: auto; padding: 1rem; }
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  margin-bottom: 0.75rem;
+  background: var(--card-bg);
+}
+
+.cart-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+/* ── Order Form ── */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.75rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15);
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text-primary);
+}
+
+.cod-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: rgba(45, 106, 79, 0.1);
+  border: 1.5px solid var(--primary-green);
+  border-radius: 9999px;
+  color: var(--primary-green);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ── WhatsApp Button ── */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 2rem;
+  background: #25d366;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  animation: glow-green 2.5s ease-in-out infinite;
+  transition: transform 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-whatsapp:hover { transform: translateY(-3px) scale(1.03); }
+
+/* WhatsApp Floating Button */
+.whatsapp-float {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 150;
+  width: 60px;
+  height: 60px;
+  background: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+  animation: glow-green 2.5s ease-in-out infinite;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.whatsapp-float:hover { transform: scale(1.1); }
+
+/* ── Footer ── */
+footer {
+  background: var(--dark);
+  color: #e2e8f0;
+}
+
+.footer-link {
+  color: #a0aec0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.footer-link:hover { color: var(--primary-orange); }
+
+/* ── Section Headings ── */
+.section-heading {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.section-sub {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 2.5rem;
+}
+
+section { padding: 4rem 0; }
+
+/* ── Success Message ── */
+.success-msg {
+  background: rgba(45, 106, 79, 0.1);
+  border: 2px solid var(--primary-green);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--primary-green);
+  font-weight: 600;
+  display: none;
+}
+
+.success-msg.show { display: block; animation: fadeInUp 0.5s ease; }
+
+/* ── Cart Badge ── */
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--primary-orange);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0);
+  transition: transform 0.2s ease;
+}
+
+.cart-badge.show { transform: scale(1); }
+
+/* ── Dark Mode Toggle ── */
+.dark-toggle {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 9999px;
+  width: 44px;
+  height: 26px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* ── Delivery Tracker ── */
+.tracker-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  padding: 2rem 0;
+  overflow-x: auto;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .product-card { min-width: 180px; }
+  #cart-panel { width: 100vw; }
+  .step-item:not(:last-child)::after { width: 60%; }
+  section { padding: 2.5rem 0; }
+  .tracker-container { gap: 0; padding: 1rem 0; }
+}
+
+@media (max-width: 480px) {
+  .freshness-badge { font-size: 0.75rem; padding: 0.5rem 1rem; flex-wrap: wrap; justify-content: center; }
+  .btn-primary, .btn-secondary, .btn-orange { padding: 0.65rem 1.25rem; font-size: 0.9rem; }
+}
+
+/* ── Utility ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
+
+.text-green { color: var(--primary-green); }
+.text-orange { color: var(--primary-orange); }
+
+.hidden { display: none !important; }

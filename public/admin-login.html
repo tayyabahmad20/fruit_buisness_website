@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login – FreshLux Fruits</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <style>
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body class="gradient-hero">
+
+  <div class="w-full max-w-md mx-4">
+    <!-- Logo / Header -->
+    <div class="text-center mb-8">
+      <div class="text-5xl mb-3">🍊</div>
+      <h1 class="text-3xl font-extrabold text-white">FreshLux Admin</h1>
+      <p class="text-white/70 mt-1">Sign in to your dashboard</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="glass-card p-8" style="background:rgba(255,255,255,0.95);">
+      <h2 class="text-xl font-bold mb-6" style="color:var(--primary-green)">Admin Login</h2>
+
+      <!-- Error Message -->
+      <div id="login-error"
+        class="hidden mb-4 p-3 rounded-lg text-red-700 bg-red-50 border border-red-200 text-sm font-medium">
+        ❌ Invalid credentials. Please try again.
+      </div>
+
+      <form id="login-form" novalidate>
+        <div class="mb-4">
+          <label class="form-label" for="username" style="color:#1a1a2e">Username</label>
+          <input type="text" id="username" class="form-input" placeholder="admin" autocomplete="username" />
+        </div>
+
+        <div class="mb-6">
+          <label class="form-label" for="password" style="color:#1a1a2e">Password</label>
+          <div class="relative">
+            <input type="password" id="password" class="form-input pr-12" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" onclick="togglePasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg"
+              id="pw-toggle-btn" title="Show/hide password">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary w-full justify-center text-base">
+          🔐 Login to Dashboard
+        </button>
+      </form>
+
+      <!-- Back Link -->
+      <div class="text-center mt-5">
+        <a href="index.html" class="text-sm" style="color:var(--primary-green)">
+          ← Back to FreshLux Website
+        </a>
+      </div>
+    </div>
+
+    <!-- Hint -->
+    <div class="text-center mt-4 text-white/60 text-xs">
+      Demo credentials: <code class="text-white/80">admin</code> / <code class="text-white/80">admin123</code>
+    </div>
+  </div>
+
+  <script>
+    // Auto-redirect if already logged in
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = 'admin-dashboard.html';
+    }
+
+    // Toggle password visibility
+    function togglePasswordVisibility() {
+      const pw = document.getElementById('password');
+      pw.type = pw.type === 'password' ? 'text' : 'password';
+    }
+
+    // Login form submission
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('login-error');
+
+      if (username === 'admin' && password === 'admin123') {
+        localStorage.setItem('adminLoggedIn', 'true');
+        localStorage.setItem('adminUsername', username);
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        errorDiv.classList.remove('hidden');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    });
+  </script>
+</body>
+</html>
