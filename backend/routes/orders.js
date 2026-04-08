@@ -49,9 +49,10 @@ router.put('/:id/status', authenticateToken, [
 
   try {
     const { status } = req.body;
+    const orderId = new (require('mongoose').Types.ObjectId)(req.params.id);
     const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
+      orderId,
+      { status: String(status) },
       { new: true }
     );
     if (!order) return res.status(404).json({ message: 'Order not found' });

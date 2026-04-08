@@ -40,8 +40,8 @@ app.use('/api/auth', authLimiter, require('./routes/auth'));
 app.use('/api/orders', apiLimiter, require('./routes/orders'));
 app.use('/api/products', apiLimiter, require('./routes/products'));
 
-// Serve index.html for all non-API routes
-app.get('*', (req, res) => {
+// Serve index.html for all non-API routes (rate limited to prevent abuse)
+app.get('*', apiLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 

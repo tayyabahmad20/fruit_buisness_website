@@ -62,7 +62,8 @@ router.put('/:id', authenticateToken, [
     if (available !== undefined) updateFields.available = available;
     if (featured !== undefined) updateFields.featured = featured;
 
-    const product = await Product.findByIdAndUpdate(req.params.id, updateFields, { new: true });
+    const productId = new (require('mongoose').Types.ObjectId)(req.params.id);
+    const product = await Product.findByIdAndUpdate(productId, updateFields, { new: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (err) {
@@ -78,7 +79,8 @@ router.delete('/:id', authenticateToken, [
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const productId = new (require('mongoose').Types.ObjectId)(req.params.id);
+    const product = await Product.findByIdAndDelete(productId);
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json({ message: 'Product deleted' });
   } catch (err) {

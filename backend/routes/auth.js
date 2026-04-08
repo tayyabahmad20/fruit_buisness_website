@@ -15,7 +15,8 @@ router.post('/login', [
 
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    // Cast to string to prevent MongoDB operator injection
+    const user = await User.findOne({ username: String(username) });
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
     const isMatch = await user.comparePassword(password);

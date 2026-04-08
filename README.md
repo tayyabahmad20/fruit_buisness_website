@@ -86,7 +86,7 @@ Or open `public/index.html` directly in a browser (frontend works without backen
 |----------------|------------------------------------------|---------------------------|
 | `PORT`         | `3000`                                   | Server port               |
 | `MONGODB_URI`  | `mongodb://localhost:27017/freshlux`     | MongoDB connection string |
-| `JWT_SECRET`   | `freshlux-secret-key-2024`               | JWT signing secret        |
+| `JWT_SECRET`   | *(required in prod)* random fallback | JWT signing secret — always set this in production |
 
 ---
 
