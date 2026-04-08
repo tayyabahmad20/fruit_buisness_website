@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FreshLux Fruits – Farm Fresh. Delivered Today.</title>
+  <meta name="description" content="Premium fruits from Pakistan's finest farms, delivered to your doorstep within hours." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'fl-green': '#2d6a4f',
+            'fl-orange': '#f4831f',
+            'fl-cream': '#fef9f0',
+            'fl-dark': '#1a1a2e'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[var(--bg-primary)] text-[var(--text-primary)]">
+
+  <!-- ══════════════════════════════════════
+       LOADING SCREEN
+  ══════════════════════════════════════ -->
+  <div id="loading-screen">
+    <span class="loading-emoji">🍊</span>
+    <p class="loading-title">FreshLux</p>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       CART OVERLAY
+  ══════════════════════════════════════ -->
+  <div id="cart-overlay" onclick="toggleCart()"></div>
+
+  <!-- ══════════════════════════════════════
+       CART PANEL
+  ══════════════════════════════════════ -->
+  <div id="cart-panel">
+    <div class="cart-header">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🛒</span>
+        <h2 class="text-xl font-bold">Your Cart</h2>
+      </div>
+      <button onclick="toggleCart()" class="text-white hover:text-gray-200 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="cart-items" id="cart-items-list">
+      <p class="text-center text-gray-400 mt-8" id="cart-empty-msg">Your cart is empty 🛒</p>
+    </div>
+    <div class="cart-footer">
+      <div class="flex justify-between items-center mb-4">
+        <span class="font-bold text-lg" style="color:var(--text-primary)">Total:</span>
+        <span class="font-bold text-xl" style="color:var(--primary-green)" id="cart-total">Rs. 0</span>
+      </div>
+      <button onclick="checkoutWhatsApp()" class="btn-whatsapp w-full justify-center">
+        <span>💬</span> Order via WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════ -->
+  <nav class="nav-sticky">
+    <div class="container">
+      <div class="flex items-center justify-between py-3">
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-2 text-2xl font-extrabold" style="color:var(--primary-green)">
+          🍊 <span>FreshLux</span>
+        </a>
+
+        <!-- Desktop Links -->
+        <div class="hidden md:flex items-center gap-1">
+          <a href="#products" class="nav-link">Products</a>
+          <a href="#box-builder" class="nav-link">Build Box</a>
+          <a href="#why-us" class="nav-link">Why Us</a>
+          <a href="#reviews" class="nav-link">Reviews</a>
+          <a href="#order-form" class="nav-link">Order Now</a>
+        </div>
+
+        <!-- Right Controls -->
+        <div class="flex items-center gap-3">
+          <!-- Dark Mode Toggle -->
+          <button id="dark-mode-btn" onclick="toggleDarkMode()" title="Toggle dark mode"
+            class="text-xl p-2 rounded-full transition hover:bg-gray-100 dark:hover:bg-gray-700">
+            🌙
+          </button>
+
+          <!-- Cart Icon -->
+          <button onclick="toggleCart()" class="relative p-2 rounded-full transition hover:bg-gray-100 dark:hover:bg-gray-700">
+            <span class="text-2xl">🛒</span>
+            <span class="cart-badge" id="cart-count">0</span>
+          </button>
+
+          <!-- Admin Link -->
+          <a href="admin-login.html" class="hidden md:inline-flex items-center gap-1 text-sm font-medium px-3 py-1 rounded-full border"
+            style="border-color:var(--border-color);color:var(--text-secondary)">
+            ⚙️ Admin
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       HERO SECTION
+  ══════════════════════════════════════ -->
+  <section class="gradient-hero relative overflow-hidden" style="min-height:100vh;display:flex;align-items:center;">
+    <!-- Floating Emojis -->
+    <span class="float-animation absolute text-5xl select-none pointer-events-none opacity-30" style="top:8%;left:5%">🍎</span>
+    <span class="float-animation absolute text-6xl select-none pointer-events-none opacity-25" style="top:15%;right:8%">🍊</span>
+    <span class="float-animation absolute text-5xl select-none pointer-events-none opacity-30" style="top:55%;left:3%">🍋</span>
+    <span class="float-animation absolute text-5xl select-none pointer-events-none opacity-25" style="top:70%;right:5%">🍇</span>
+    <span class="float-animation absolute text-4xl select-none pointer-events-none opacity-30" style="top:30%;left:50%">🍓</span>
+    <span class="float-animation absolute text-6xl select-none pointer-events-none opacity-20" style="top:80%;left:45%">🥭</span>
+
+    <div class="container relative z-10 py-20">
+      <div class="max-w-3xl mx-auto text-center">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-sm font-semibold"
+          style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(8px)">
+          🌾 Pakistan's #1 Premium Fruit Delivery
+        </div>
+
+        <h1 id="hero-heading" class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight">
+          Farm Fresh.<br /><span style="color:#ffd700;">Delivered Today.</span>
+        </h1>
+        <p id="hero-sub" class="text-xl md:text-2xl text-white/80 mb-10 max-w-2xl mx-auto">
+          Premium fruits from Pakistan's finest farms, delivered to your doorstep within hours.
+        </p>
+        <div class="flex flex-wrap gap-4 justify-center">
+          <a href="#order-form" class="btn-primary text-lg">🛒 Order Your Box Now</a>
+          <a href="#products" class="btn-secondary text-lg">🍎 Explore Fruits</a>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="flex flex-wrap justify-center gap-8 mt-14">
+          <div class="text-center text-white">
+            <div class="text-3xl font-extrabold">500+</div>
+            <div class="text-white/70 text-sm">Daily Orders</div>
+          </div>
+          <div class="text-center text-white">
+            <div class="text-3xl font-extrabold">20+</div>
+            <div class="text-white/70 text-sm">Fruit Varieties</div>
+          </div>
+          <div class="text-center text-white">
+            <div class="text-3xl font-extrabold">3hrs</div>
+            <div class="text-white/70 text-sm">Avg. Delivery</div>
+          </div>
+          <div class="text-center text-white">
+            <div class="text-3xl font-extrabold">4.9★</div>
+            <div class="text-white/70 text-sm">Rating</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FRESHNESS BADGE STRIP
+  ══════════════════════════════════════ -->
+  <div style="background:var(--bg-secondary);border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color);">
+    <div class="container py-5 text-center">
+      <span class="freshness-badge">
+        ✅ 100% Freshness Guaranteed &nbsp;|&nbsp; Same-Day Delivery &nbsp;|&nbsp; Farm to Door
+      </span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TODAY'S FRESH PICKS
+  ══════════════════════════════════════ -->
+  <section id="products">
+    <div class="container">
+      <h2 class="section-heading slide-up">Today's Fresh Picks 🍃</h2>
+      <p class="section-sub slide-up delay-100">Handpicked this morning from certified farms</p>
+
+      <div class="scroll-container pb-4" id="products-container">
+
+        <!-- Sindhri Mangoes -->
+        <div class="product-card scale-in delay-100">
+          <span class="product-emoji">🥭</span>
+          <div class="product-name">Sindhri Mangoes</div>
+          <div class="product-price mb-3">5kg: Rs.850 &nbsp;|&nbsp; 10kg: Rs.1,600</div>
+          <button onclick="addToCart({id:'mango',name:'Sindhri Mangoes',emoji:'🥭',price5kg:850,price10kg:1600},'5kg')"
+            class="btn-orange text-sm px-4 py-2">Add to Cart</button>
+        </div>
+
+        <!-- Strawberries -->
+        <div class="product-card scale-in delay-200">
+          <span class="product-emoji">🍓</span>
+          <div class="product-name">Strawberries</div>
+          <div class="product-price mb-3">5kg: Rs.1,200 &nbsp;|&nbsp; 10kg: Rs.2,200</div>
+          <button onclick="addToCart({id:'strawberry',name:'Strawberries',emoji:'🍓',price5kg:1200,price10kg:2200},'5kg')"
+            class="btn-orange text-sm px-4 py-2">Add to Cart</button>
+        </div>
+
+        <!-- Green Grapes -->
+        <div class="product-card scale-in delay-300">
+          <span class="product-emoji">🍇</span>
+          <div class="product-name">Green Grapes</div>
+          <div class="product-price mb-3">5kg: Rs.950 &nbsp;|&nbsp; 10kg: Rs.1,800</div>
+          <button onclick="addToCart({id:'grapes',name:'Green Grapes',emoji:'🍇',price5kg:950,price10kg:1800},'5kg')"
+            class="btn-orange text-sm px-4 py-2">Add to Cart</button>
+        </div>
+
+        <!-- Blood Oranges -->
+        <div class="product-card scale-in delay-400">
+          <span class="product-emoji">🍊</span>
+          <div class="product-name">Blood Oranges</div>
+          <div class="product-price mb-3">5kg: Rs.600 &nbsp;|&nbsp; 10kg: Rs.1,100</div>
+          <button onclick="addToCart({id:'orange',name:'Blood Oranges',emoji:'🍊',price5kg:600,price10kg:1100},'5kg')"
+            class="btn-orange text-sm px-4 py-2">Add to Cart</button>
+        </div>
+
+        <!-- Kashmiri Apples -->
+        <div class="product-card scale-in delay-500">
+          <span class="product-emoji">🍎</span>
+          <div class="product-name">Kashmiri Apples</div>
+          <div class="product-price mb-3">5kg: Rs.750 &nbsp;|&nbsp; 10kg: Rs.1,400</div>
+          <button onclick="addToCart({id:'apple',name:'Kashmiri Apples',emoji:'🍎',price5kg:750,price10kg:1400},'5kg')"
+            class="btn-orange text-sm px-4 py-2">Add to Cart</button>
+        </div>
+
+        <!-- Bananas -->
+        <div class="product-card scale-in delay-100">
+          <span class="product-emoji">🍌</span>
+          <div class="product-name">Bananas</div>
+          <div class="product-price mb-3">5kg: Rs.400 &nbsp;|&nbsp; 10kg: Rs.750</div>
+          <button onclick="addToCart({id:'banana',name:'Bananas',emoji:'🍌',price5kg:400,price10kg:750},'5kg')"
+            class="btn-orange text-sm px-4 py-2">Add to Cart</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       BUILD YOUR FRUIT BOX
+  ══════════════════════════════════════ -->
+  <section id="box-builder" style="background:var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-heading slide-up">Build Your Fruit Box 📦</h2>
+      <p class="section-sub slide-up delay-100">Choose your box size, select your fruits, and enjoy!</p>
+
+      <!-- Box Type Selector -->
+      <div class="flex flex-wrap gap-3 justify-center mb-8">
+        <button class="box-type-btn active" id="btn-5kg" onclick="setBoxType('5kg')">5kg Box – Rs.1,800</button>
+        <button class="box-type-btn" id="btn-10kg" onclick="setBoxType('10kg')">10kg Box – Rs.3,200</button>
+        <button class="box-type-btn" id="btn-custom" onclick="setBoxType('custom')">Custom Box</button>
+      </div>
+
+      <!-- Fruit Selector Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8">
+        <div class="fruit-selector-item" data-fruit-id="mango" data-price="850" onclick="toggleFruit(this)">
+          <div class="checkmark">✓</div>
+          <span class="text-4xl mb-1">🥭</span>
+          <span class="text-sm font-semibold" style="color:var(--text-primary)">Mangoes</span>
+          <span class="text-xs" style="color:var(--text-secondary)">Rs.850/5kg</span>
+        </div>
+        <div class="fruit-selector-item" data-fruit-id="strawberry" data-price="1200" onclick="toggleFruit(this)">
+          <div class="checkmark">✓</div>
+          <span class="text-4xl mb-1">🍓</span>
+          <span class="text-sm font-semibold" style="color:var(--text-primary)">Strawberries</span>
+          <span class="text-xs" style="color:var(--text-secondary)">Rs.1200/5kg</span>
+        </div>
+        <div class="fruit-selector-item" data-fruit-id="grapes" data-price="950" onclick="toggleFruit(this)">
+          <div class="checkmark">✓</div>
+          <span class="text-4xl mb-1">🍇</span>
+          <span class="text-sm font-semibold" style="color:var(--text-primary)">Grapes</span>
+          <span class="text-xs" style="color:var(--text-secondary)">Rs.950/5kg</span>
+        </div>
+        <div class="fruit-selector-item" data-fruit-id="orange" data-price="600" onclick="toggleFruit(this)">
+          <div class="checkmark">✓</div>
+          <span class="text-4xl mb-1">🍊</span>
+          <span class="text-sm font-semibold" style="color:var(--text-primary)">Oranges</span>
+          <span class="text-xs" style="color:var(--text-secondary)">Rs.600/5kg</span>
+        </div>
+        <div class="fruit-selector-item" data-fruit-id="apple" data-price="750" onclick="toggleFruit(this)">
+          <div class="checkmark">✓</div>
+          <span class="text-4xl mb-1">🍎</span>
+          <span class="text-sm font-semibold" style="color:var(--text-primary)">Apples</span>
+          <span class="text-xs" style="color:var(--text-secondary)">Rs.750/5kg</span>
+        </div>
+        <div class="fruit-selector-item" data-fruit-id="banana" data-price="400" onclick="toggleFruit(this)">
+          <div class="checkmark">✓</div>
+          <span class="text-4xl mb-1">🍌</span>
+          <span class="text-sm font-semibold" style="color:var(--text-primary)">Bananas</span>
+          <span class="text-xs" style="color:var(--text-secondary)">Rs.400/5kg</span>
+        </div>
+      </div>
+
+      <!-- Box Summary & Add to Cart -->
+      <div class="max-w-md mx-auto glass-card p-6 text-center">
+        <div class="text-sm font-semibold mb-1" style="color:var(--text-secondary)" id="box-summary-label">5kg Box Selected</div>
+        <div class="text-4xl font-extrabold mb-4" style="color:var(--primary-green)" id="box-price-display">Rs. 1,800</div>
+        <button onclick="addBoxToCart()" class="btn-primary w-full justify-center text-lg">
+          📦 Add Box to Cart
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FROM FARM TO DOORSTEP
+  ══════════════════════════════════════ -->
+  <section>
+    <div class="container">
+      <h2 class="section-heading slide-up">From Farm to Doorstep 🚚</h2>
+      <p class="section-sub slide-up delay-100">Our seamless delivery process</p>
+
+      <div class="tracker-container">
+        <div class="step-item done">
+          <div class="step-circle">🌾</div>
+          <div class="text-center mt-2">
+            <div class="font-bold text-sm" style="color:var(--text-primary)">Farm Harvested</div>
+            <div class="text-xs" style="color:var(--text-secondary)">Fresh each morning</div>
+          </div>
+        </div>
+        <div class="step-item done">
+          <div class="step-circle">🧺</div>
+          <div class="text-center mt-2">
+            <div class="font-bold text-sm" style="color:var(--text-primary)">Quality Checked</div>
+            <div class="text-xs" style="color:var(--text-secondary)">Grade A sorting</div>
+          </div>
+        </div>
+        <div class="step-item active">
+          <div class="step-circle">🚗</div>
+          <div class="text-center mt-2">
+            <div class="font-bold text-sm" style="color:var(--primary-green)">Fast Dispatch</div>
+            <div class="text-xs" style="color:var(--text-secondary)">Same-day delivery</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle">🏠</div>
+          <div class="text-center mt-2">
+            <div class="font-bold text-sm" style="color:var(--text-primary)">At Your Door</div>
+            <div class="text-xs" style="color:var(--text-secondary)">Within hours</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       WHY CHOOSE US
+  ══════════════════════════════════════ -->
+  <section id="why-us" style="background:var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-heading slide-up">Why Choose Us? 💚</h2>
+      <p class="section-sub slide-up delay-100">We set the standard for premium fruit delivery</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="feature-card scale-in delay-100">
+          <span class="feature-icon">🌿</span>
+          <h3 class="text-xl font-bold mb-2" style="color:var(--text-primary)">Fresh Daily</h3>
+          <p style="color:var(--text-secondary)">Harvested fresh every morning from certified farms across Pakistan.</p>
+        </div>
+        <div class="feature-card scale-in delay-200">
+          <span class="feature-icon">🚚</span>
+          <h3 class="text-xl font-bold mb-2" style="color:var(--text-primary)">Free Delivery</h3>
+          <p style="color:var(--text-secondary)">Free delivery on all orders above Rs.1,000. Fast and reliable.</p>
+        </div>
+        <div class="feature-card scale-in delay-300">
+          <span class="feature-icon">✅</span>
+          <h3 class="text-xl font-bold mb-2" style="color:var(--text-primary)">Quality Guaranteed</h3>
+          <p style="color:var(--text-secondary)">100% satisfaction guarantee — full refund if you're not happy.</p>
+        </div>
+        <div class="feature-card scale-in delay-400">
+          <span class="feature-icon">📞</span>
+          <h3 class="text-xl font-bold mb-2" style="color:var(--text-primary)">24/7 Support</h3>
+          <p style="color:var(--text-secondary)">WhatsApp support available anytime. We're always here for you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       CUSTOMER REVIEWS
+  ══════════════════════════════════════ -->
+  <section id="reviews">
+    <div class="container">
+      <h2 class="section-heading slide-up">What Our Customers Say ⭐</h2>
+      <p class="section-sub slide-up delay-100">Trusted by hundreds of happy families</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="testimonial-card scale-in delay-100">
+          <div class="star-rating mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="mb-4 italic" style="color:var(--text-secondary)">"The mangoes were absolutely incredible! Delivered within 3 hours. Best fruit I've ever had from a delivery service!"</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full gradient-btn flex items-center justify-center text-white font-bold">A</div>
+            <div>
+              <div class="font-bold" style="color:var(--text-primary)">Ahmed K.</div>
+              <div class="text-xs" style="color:var(--text-secondary)">Karachi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card scale-in delay-200">
+          <div class="star-rating mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="mb-4 italic" style="color:var(--text-secondary)">"Fresh strawberries every week. My kids absolutely love them! FreshLux has made snack time so much better."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full gradient-btn flex items-center justify-center text-white font-bold">S</div>
+            <div>
+              <div class="font-bold" style="color:var(--text-primary)">Sara M.</div>
+              <div class="text-xs" style="color:var(--text-secondary)">Lahore</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card scale-in delay-300">
+          <div class="star-rating mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="mb-4 italic" style="color:var(--text-secondary)">"Best fruit delivery service in Pakistan. Highly recommended! The quality is consistently amazing every single time."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full gradient-btn flex items-center justify-center text-white font-bold">U</div>
+            <div>
+              <div class="font-bold" style="color:var(--text-primary)">Usman T.</div>
+              <div class="text-xs" style="color:var(--text-secondary)">Islamabad</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       DELIVERY TRACKER MOCKUP
+  ══════════════════════════════════════ -->
+  <section style="background:var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-heading slide-up">Live Order Tracking 📍</h2>
+      <p class="section-sub slide-up delay-100">Track your order every step of the way</p>
+
+      <div class="max-w-2xl mx-auto glass-card p-8">
+        <div class="flex items-start justify-between">
+          <!-- Stage 1: Order Placed -->
+          <div class="step-item done flex-1">
+            <div class="step-circle">📝</div>
+            <div class="text-center mt-2 px-1">
+              <div class="font-bold text-xs" style="color:var(--primary-green)">Order Placed</div>
+            </div>
+          </div>
+          <!-- Stage 2: Packed -->
+          <div class="step-item done flex-1">
+            <div class="step-circle">📦</div>
+            <div class="text-center mt-2 px-1">
+              <div class="font-bold text-xs" style="color:var(--primary-green)">Packed</div>
+            </div>
+          </div>
+          <!-- Stage 3: On the Way (Active) -->
+          <div class="step-item active flex-1">
+            <div class="step-circle">🚗</div>
+            <div class="text-center mt-2 px-1">
+              <div class="font-bold text-xs" style="color:var(--primary-green)">On the Way</div>
+              <div class="text-xs font-bold" style="color:var(--primary-orange)">● LIVE</div>
+            </div>
+          </div>
+          <!-- Stage 4: Delivered -->
+          <div class="step-item flex-1">
+            <div class="step-circle">🏠</div>
+            <div class="text-center mt-2 px-1">
+              <div class="font-bold text-xs" style="color:var(--text-secondary)">Delivered</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 text-center">
+          <p class="text-sm" style="color:var(--text-secondary)">Your order is approximately <strong style="color:var(--primary-orange)">30 minutes</strong> away!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       ORDER FORM
+  ══════════════════════════════════════ -->
+  <section id="order-form">
+    <div class="container">
+      <h2 class="section-heading slide-up">Place Your Order 🛒</h2>
+      <p class="section-sub slide-up delay-100">Fill in your details and order via WhatsApp instantly</p>
+
+      <div class="max-w-2xl mx-auto glass-card p-8">
+        <!-- COD Badge -->
+        <div class="flex justify-center mb-6">
+          <span class="cod-badge">💰 Cash on Delivery Available</span>
+        </div>
+
+        <form id="main-order-form" novalidate>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label class="form-label" for="customer-name">Full Name *</label>
+              <input type="text" id="customer-name" class="form-input" placeholder="e.g. Ahmed Khan" required />
+            </div>
+            <div>
+              <label class="form-label" for="customer-phone">Phone Number *</label>
+              <input type="tel" id="customer-phone" class="form-input" placeholder="03XX-XXXXXXX" required />
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <label class="form-label" for="customer-address">Full Address *</label>
+            <textarea id="customer-address" class="form-input" rows="3"
+              placeholder="House No., Street, Block, Area, City" required></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label class="form-label" for="order-box-type">Box Type *</label>
+              <select id="order-box-type" class="form-input">
+                <option value="5kg">5kg Box – Rs.1,800</option>
+                <option value="10kg">10kg Box – Rs.3,200</option>
+                <option value="custom">Custom Box</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="order-fruits">Preferred Fruits</label>
+              <input type="text" id="order-fruits" class="form-input" placeholder="e.g. Mangoes, Grapes" />
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="form-label" for="special-instructions">Special Instructions <span style="color:var(--text-secondary);font-weight:400">(optional)</span></label>
+            <textarea id="special-instructions" class="form-input" rows="2"
+              placeholder="Any special requests..."></textarea>
+          </div>
+
+          <!-- Error message -->
+          <div id="form-error" class="hidden mb-4 p-3 rounded-lg text-red-700 bg-red-50 border border-red-200 text-sm font-medium"></div>
+
+          <button type="submit" class="btn-whatsapp w-full justify-center text-lg">
+            💬 Send Order via WhatsApp
+          </button>
+        </form>
+
+        <!-- Success Message -->
+        <div class="success-msg" id="order-success">
+          <div class="text-4xl mb-3">🎉</div>
+          <div class="text-xl font-bold mb-2" style="color:var(--primary-green)">Order Sent Successfully!</div>
+          <div style="color:var(--text-secondary)">Your order has been sent to our WhatsApp. We'll confirm within minutes. Thank you!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="container py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Brand -->
+        <div class="md:col-span-2">
+          <div class="text-3xl font-extrabold text-white mb-3">🍊 FreshLux</div>
+          <p class="text-gray-400 mb-5 max-w-sm">Pakistan's premium fruit delivery service — bringing the freshest produce from farm to your doorstep within hours.</p>
+          <!-- Social Icons -->
+          <div class="flex gap-4">
+            <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center text-lg transition"
+              style="background:rgba(255,255,255,0.1);color:#e2e8f0" title="Facebook">
+              📘
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center text-lg transition"
+              style="background:rgba(255,255,255,0.1);color:#e2e8f0" title="Instagram">
+              📸
+            </a>
+            <a href="https://wa.me/923001234567" target="_blank"
+              class="w-10 h-10 rounded-full flex items-center justify-center text-lg transition"
+              style="background:rgba(37,211,102,0.2);color:#25d366" title="WhatsApp">
+              💬
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="font-bold text-white mb-4">Quick Links</h4>
+          <a href="#products" class="footer-link">Fresh Picks</a>
+          <a href="#box-builder" class="footer-link">Build a Box</a>
+          <a href="#why-us" class="footer-link">Why FreshLux</a>
+          <a href="#reviews" class="footer-link">Reviews</a>
+          <a href="#order-form" class="footer-link">Order Now</a>
+          <a href="admin-login.html" class="footer-link">Admin Panel</a>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="font-bold text-white mb-4">Contact Us</h4>
+          <div class="footer-link">📍 Karachi, Pakistan</div>
+          <a href="tel:+923001234567" class="footer-link">📞 +92 300 1234567</a>
+          <a href="mailto:hello@freshlux.pk" class="footer-link">📧 hello@freshlux.pk</a>
+          <a href="https://wa.me/923001234567" target="_blank" class="footer-link">💬 WhatsApp Us</a>
+          <div class="mt-4 text-xs text-gray-500">Mon – Sat: 7am – 8pm<br/>Sun: 9am – 6pm</div>
+        </div>
+      </div>
+
+      <div class="border-t mt-10 pt-6 text-center" style="border-color:rgba(255,255,255,0.1)">
+        <p class="text-gray-500 text-sm">© 2024 FreshLux Fruits. All rights reserved. Made with 💚 in Pakistan.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════
+       FLOATING WHATSAPP BUTTON
+  ══════════════════════════════════════ -->
+  <a href="https://wa.me/923001234567" target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
+    💬
+  </a>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
